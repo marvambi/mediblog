@@ -66,7 +66,7 @@ export class BlogController {
     const response = await this.blogRepository.query("INSERT INTO blog_post (title, description) VALUES(" + `"${title}"` + ", "  + `"${description}"` + ")");
 
     if (!response) {
-      return responses.error(codes.error(), messages.notFound(), res);
+      return res.send({status: codes.error(), message: messages.error()});
     }
 
     const blog_id = response.blog_id;
@@ -85,7 +85,7 @@ export class BlogController {
    * @param res
    * @returns response
    */
-  updateBlog = async (req: Request, res: Response) => {
+  updateBlog = async (req: Request, res: Response, next: NextFunction) => {
     const {
       title,
       description,
@@ -96,23 +96,19 @@ export class BlogController {
 
     const { blog_id } = req.params;
 
-    const response = await this.blogRepository.update(parseInt(blog_id), {
-      title,
-      description,
-    });
+    // parseInt(blog_id)
+    const response = await this.blogRepository.query("UPDATE blog_post SET title = " + `"${title}", description = "${description}" WHERE blog_id=${blog_id};`);
 
     if (!response) {
-      return responses.error(codes.error(), messages.error(), res);
+      return res.send({status: codes.error(), message: messages.error()});
     }
 
-    return responses.success(
-      codes.ok(),
-      messages.ok(),
-      { blog_id, title, description },
-      res
-    );
-  };
-
+    return {
+      status: codes.created(),
+      message: messages.updated(),
+      data: { blog_id, title, description }
+    };
+  }
   /**
    * Update one blog
    * @author Marvin Ambrose

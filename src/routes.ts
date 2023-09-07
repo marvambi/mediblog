@@ -46,8 +46,15 @@ export const Routes = [
 
     {
         method: "post",
-        route: "/blog/",
+        route: "/blog",
         controller: BlogController,
         action: "createBlog"
+    },
+
+    {
+        method: "put",
+        route:"/blog/:blog_id",
+        controller: BlogController,
+        action: "updateBlog"
     }
 ]
