@@ -1,6 +1,6 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response } from "express"
-import { User } from "../entity/User"
+import { User } from "../data/entity/User"
 import { secure } from ".."
 export class UserController {
 
