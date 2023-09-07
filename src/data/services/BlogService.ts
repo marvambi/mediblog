@@ -1,4 +1,4 @@
-import Blog from "../entity/Blog";
+import BlogPost from "../entity/Blog";
 
 /**
  * @author Marvin Ambrose
@@ -11,7 +11,7 @@ class BlogService {
    * @returns Promise
    */
   findBlogs = async (): Promise<any | null> => {
-    const result = await Blog.findAndCount();
+    const result = await BlogPost.findAndCount();
 
     if (!result) {
       return null;
@@ -26,7 +26,7 @@ class BlogService {
    * @returns Promise
    */
   findOneBlog = async (blog_id: number): Promise<any | null> => {
-    const result = await Blog.findOne({ blog_id });
+    const result = await BlogPost.findOne({blog_id});
 
     if (!result) {
       return null;
@@ -41,7 +41,7 @@ class BlogService {
    * @returns Promise
    */
   createBlog = async (data: object): Promise<any | null> => {
-    const result = await Blog.insert(data);
+    const result = await BlogPost.insert(data);
 
     if (!result) {
       return null;
@@ -56,7 +56,7 @@ class BlogService {
    * @returns Promise
    */
   updateBlog = async (blog_id: number, data: object): Promise<any | null> => {
-    const result = await Blog.update(blog_id, data);
+    const result = await BlogPost.update(blog_id, data);
 
     if (!result) {
       return null;
@@ -71,7 +71,7 @@ class BlogService {
    * @returns Promise
    */
   deleteBlog = async (blog_id: number): Promise<any | null> => {
-    const result = await Blog.delete({ blog_id });
+    const result = await BlogPost.delete({ blog_id });
 
     if (!result) {
       return null;
@@ -80,4 +80,4 @@ class BlogService {
   };
 }
 
-export default BlogService;
+export default {BlogService};
