@@ -24,7 +24,7 @@ export class BlogController {
 
     const blogPosts = await this.blogRepository.query("SELECT * FROM blog_post");
     
-    return blogPosts.length > 0 ? { "status": 200, "count": blogPosts.length, blogPosts} : {"status": codes.error(), "message": messages.error()}
+    return blogPosts.length > 0 ? { "status": 200, "count": blogPosts.length, blogPosts} : {"status": codes.error(), "message": messages.notFound()}
   };
 
   /**
@@ -62,10 +62,8 @@ export class BlogController {
       description: string;
     } = req.body;
 
-    const response = await this.blogRepository.create({
-      title,
-      description,
-    });
+    console.log(title, description);
+    const response = await this.blogRepository.query("INSERT INTO blog_post (title, description) VALUES(" + `"${title}"` + ", "  + `"${description}"` + ")");
 
     if (!response) {
       return responses.error(codes.error(), messages.notFound(), res);
@@ -73,12 +71,11 @@ export class BlogController {
 
     const blog_id = response.blog_id;
 
-    return responses.success(
-      codes.created(),
-      messages.created(),
-      { blog_id, title, description },
-      res
-    );
+    return {
+      status: codes.created(),
+      message: messages.created(),
+      data: { blog_id, title, description }
+    };
   };
 
   /**
