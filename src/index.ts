@@ -1,12 +1,31 @@
-import * as express from "express"
+import express from "express"
 import * as bodyParser from "body-parser"
 import { Request, Response } from "express"
 import { AppDataSource } from "./data-source"
 import { Routes } from "./routes"
 import { User } from "./entity/User"
+import crypto  from "node:crypto"
+import * as dotenv from "dotenv";
+
+/**
+     * hash password with sha512.
+     * @function
+     * @param {string} password - List of required fields.
+     * @param {string} salt - Data to be validated.
+     */
+export function secure(password, salt){
+    var hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
+    hash.update(password);
+    var value = hash.digest('hex');
+    return {
+        salt:salt,
+        passwordHash:value
+    };
+};
 
 AppDataSource.initialize().then(async () => {
-
+    // init dotenv
+    dotenv.config();
     // create express app
     const app = express()
     app.use(bodyParser.json())
@@ -25,28 +44,24 @@ AppDataSource.initialize().then(async () => {
     })
 
     // setup express app here
-    // ...
+    
+    const { PORT, APP_PORT } = process.env;
 
     // start express server
-    app.listen(3000)
+    app.listen(APP_PORT || 3001)
+
+    await AppDataSource.manager.clear(User)
 
     // insert new users for test
     await AppDataSource.manager.save(
         AppDataSource.manager.create(User, {
-            firstName: "Timber",
-            lastName: "Saw",
-            age: 27
+            firstName: "Marvin",
+            lastName: "Ambrose",
+            email: "marvambi@gmail.com",
+            password: secure("Eniolo@11X", "xrY8%r").passwordHash
         })
     )
 
-    await AppDataSource.manager.save(
-        AppDataSource.manager.create(User, {
-            firstName: "Phantom",
-            lastName: "Assassin",
-            age: 24
-        })
-    )
-
-    console.log("Express server has started on port 3000. Open http://localhost:3000/users to see results")
+    console.log(`Express server has started on port ${APP_PORT}. Open http://localhost:3000/users to see results`)
 
 }).catch(error => console.log(error))

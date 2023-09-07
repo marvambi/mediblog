@@ -1,7 +1,7 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response } from "express"
 import { User } from "../entity/User"
-
+import { secure } from ".."
 export class UserController {
 
     private userRepository = AppDataSource.getRepository(User)
@@ -25,12 +25,18 @@ export class UserController {
     }
 
     async save(request: Request, response: Response, next: NextFunction) {
-        const { firstName, lastName, age } = request.body;
+        const { firstName, lastName, email, password } = request.body;
+        const {
+            createHash
+          } = await import('crypto');
+
+        const hash = createHash('sha256');
 
         const user = Object.assign(new User(), {
             firstName,
             lastName,
-            age
+            email,
+            password: secure("Oche@1122YX", "xrY8%r"),
         })
 
         return this.userRepository.save(user)
