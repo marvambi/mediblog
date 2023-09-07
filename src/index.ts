@@ -8,7 +8,7 @@ import crypto  from "node:crypto"
 import * as dotenv from "dotenv";
 
 /**
-     * hash password with sha512.
+     * hash password with utility with sha512.
      * @function
      * @param {string} password - List of required fields.
      * @param {string} salt - Data to be validated.
@@ -45,7 +45,7 @@ AppDataSource.initialize().then(async () => {
 
     // setup express app here
     
-    const { PORT, APP_PORT } = process.env;
+    const { APP_SALT, APP_PORT } = process.env;
 
     // start express server
     app.listen(APP_PORT || 3001)
@@ -58,7 +58,7 @@ AppDataSource.initialize().then(async () => {
             firstName: "Marvin",
             lastName: "Ambrose",
             email: "marvambi@gmail.com",
-            password: secure("Eniolo@11X", "xrY8%r").passwordHash
+            password: secure("Eniolo@11X", APP_SALT).passwordHash
         })
     )
 

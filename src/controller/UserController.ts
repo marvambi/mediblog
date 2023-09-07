@@ -31,12 +31,14 @@ export class UserController {
           } = await import('crypto');
 
         const hash = createHash('sha256');
+        const { APP_SALT } = process.env;
+
 
         const user = Object.assign(new User(), {
             firstName,
             lastName,
             email,
-            password: secure("Oche@1122YX", "xrY8%r"),
+            password: secure("Oche@1122YX", APP_SALT),
         })
 
         return this.userRepository.save(user)
