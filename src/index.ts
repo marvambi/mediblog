@@ -6,6 +6,7 @@ import { Routes } from "./routes"
 import { User } from "./data/entity/User"
 import crypto  from "node:crypto"
 import * as dotenv from "dotenv";
+import {BlogPost} from "./data/entity/Blog"
 
 /**
      * hash password with utility with sha512.
@@ -62,6 +63,21 @@ AppDataSource.initialize().then(async () => {
         })
     )
 
-    console.log(`Express server has started on port ${APP_PORT}. Open http://localhost:3000/users to see results`)
+    // insert new users for test
+    await AppDataSource.manager.save(
+        AppDataSource.manager.create(BlogPost, {
+            title: "Marvin",
+            description: "Ambrose Blog Post",
+        })
+    )
+
+    await AppDataSource.manager.save(
+        AppDataSource.manager.create(BlogPost, {
+            title: "Independence and Unity",
+            description: "For the good of Humanity and the Federation",
+        })
+    )
+
+    console.log(`Express server has started on port ${APP_PORT}. Open http://localhost:${APP_PORT}/users to see results`)
 
 }).catch(error => console.log(error))

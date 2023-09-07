@@ -1,67 +1,59 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { middlewares } from "../middlewares";
 
-import Service from "../data/services/BlogService";
+import {BlogPost} from "../data/entity/Blog";
+import { AppDataSource } from "../data-source";
 
 const { responses, messages, codes } = middlewares;
 
-const { BlogService } = Service;
 /**
- * @author Ntavigwa Bashombe
+ * @author Marvin Ambrose
  */
-class BlogController {
+export class BlogController {
   /**
    * Find all blogs
-   * @author Ntavigwa Bashombe
+   * @author Marvin Ambrose
    * @param req
    * @param res
    * @returns response
    */
+
+  private blogRepository = AppDataSource.getRepository(BlogPost);
+
   findBlogs = async (req: Request, res: Response) => {
-    const response = await BlogService.findBlogs();
 
-    if (!response) {
-      return responses.error(codes.error(), messages.error(), res);
-    }
-
-    return responses.success(
-      codes.ok(),
-      messages.ok(),
-      {
-        count: response[1],
-        data: response[0],
-      },
-      res
-    );
+    const blogPosts = await this.blogRepository.query("SELECT * FROM blog_post");
+    
+    return blogPosts.length > 0 ? { "status": 200, "count": blogPosts.length, blogPosts} : {"status": codes.error(), "message": messages.error()}
   };
 
   /**
    * Find one blog
-   * @author Ntavigwa Bashombe
+   * @author Marvin Ambrose
    * @param req
    * @param res
    * @returns response
    */
-  findOneBlog = async (req: Request, res: Response) => {
-    const { blog_id } = req.params;
+  findOneBlog = async (req: Request, res: Response, next: NextFunction) => {
+    const blog_id = parseInt(req.params.blog_id);
 
-    const response = await BlogService.findOneBlog(parseInt(blog_id));
+    const response = await this.blogRepository.query(`SELECT blog_id, title, description FROM blog_post WHERE blog_id=${blog_id}`);
 
     if (!response) {
-      return responses.error(codes.error(), messages.notFound(), res);
+      res.status(404).send({message: `Blog Post with id: ${blog_id} not found`});
     }
 
-    return responses.success(codes.ok(), messages.ok(), response, res);
+    return response.length > 0 ? { "status": 200, data: response} : {"status": 404, "message": `Blog Post with id: ${blog_id} not found`}
   };
 
   /**
    * Create a new blog
-   * @author Ntavigwa Bashombe
+   * @author Marvin Ambrose
    * @param req
    * @param res
    * @returns response
    */
-  createBlog = async (req: Request, res: Response) => {
+  createBlog = async (req: Request, res: Response, next: NextFunction) => {
     const {
       title,
       description,
@@ -70,7 +62,7 @@ class BlogController {
       description: string;
     } = req.body;
 
-    const response = await BlogService.createBlog({
+    const response = await this.blogRepository.create({
       title,
       description,
     });
@@ -79,7 +71,7 @@ class BlogController {
       return responses.error(codes.error(), messages.notFound(), res);
     }
 
-    const blog_id = response.raw.insertId;
+    const blog_id = response.blog_id;
 
     return responses.success(
       codes.created(),
@@ -91,7 +83,7 @@ class BlogController {
 
   /**
    * Update one blog
-   * @author Ntavigwa Bashombe
+   * @author Marvin Ambrose
    * @param req
    * @param res
    * @returns response
@@ -107,7 +99,7 @@ class BlogController {
 
     const { blog_id } = req.params;
 
-    const response = await BlogService.updateBlog(parseInt(blog_id), {
+    const response = await this.blogRepository.update(parseInt(blog_id), {
       title,
       description,
     });
@@ -126,7 +118,7 @@ class BlogController {
 
   /**
    * Update one blog
-   * @author Ntavigwa Bashombe
+   * @author Marvin Ambrose
    * @param req
    * @param res
    * @returns response
@@ -134,7 +126,7 @@ class BlogController {
   deleteBlog = async (req: Request, res: Response) => {
     const { blog_id } = req.params;
 
-    const response = await BlogService.deleteBlog(parseInt(blog_id));
+    const response = await this.blogRepository.delete(parseInt(blog_id));
 
     if (!response) {
       return responses.error(codes.error(), messages.error(), res);
@@ -143,5 +135,3 @@ class BlogController {
     return responses.ok(codes.ok(), messages.ok(), res);
   };
 }
-
-export default BlogController;
