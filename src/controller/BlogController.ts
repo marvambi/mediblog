@@ -124,12 +124,22 @@ export class BlogController {
   deleteBlog = async (req: Request, res: Response) => {
     const { blog_id } = req.params;
 
-    const response = await this.blogRepository.delete(parseInt(blog_id));
+    // check for blog id 
+    const blogpost = await this.blogRepository.query(`SELECT blog_id, title, description FROM blog_post WHERE blog_id=${parseInt(blog_id)}`);
+    if (!blogpost.length) {
+      res.status(404).send({message: `Blog Post with id: ${blog_id} not found`});
+      return;
+    }
+
+    const response = await this.blogRepository.query(`DELETE FROM blog_post WHERE blog_id = ${parseInt(blog_id)}`);
 
     if (!response) {
       return responses.error(codes.error(), messages.error(), res);
     }
 
-    return responses.ok(codes.ok(), messages.ok(), res);
+    return {
+      status: codes.ok(),
+      message: messages.deleted(),
+    };
   };
 }
