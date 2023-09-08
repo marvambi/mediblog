@@ -95,7 +95,12 @@ export class BlogController {
     } = req.body;
 
     const { blog_id } = req.params;
-
+    // check for blog id 
+    const blogpost = await this.blogRepository.query(`SELECT blog_id, title, description FROM blog_post WHERE blog_id=${parseInt(blog_id)}`);
+    if (!blogpost.length) {
+      return res.status(404).send({message: `Blog Post with id: ${blog_id} not found`});
+    }
+    
     // parseInt(blog_id)
     const response = await this.blogRepository.query("UPDATE blog_post SET title = " + `"${title}", description = "${description}" WHERE blog_id=${blog_id};`);
 
