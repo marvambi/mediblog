@@ -53,15 +53,29 @@ export const Routes = [
 
     {
         method: "put",
-        route:"/blog/:blog_id",
+        route: "/blog/:blog_id",
         controller: BlogController,
         action: "updateBlog"
     },
 
     {
         method: "delete",
-        route:"/blog/:blog_id",
+        route: "/blog/:blog_id",
         controller: BlogController,
         action: "deleteBlog"
+    },
+
+    {
+        method: "post",
+        route: "/login",
+        controller: UserController,
+        action: "login"
+    },
+
+    {
+        method: "get",
+        route: "/logout",
+        controller: UserController,
+        action: "logout"
     }
 ]
