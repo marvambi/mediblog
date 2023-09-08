@@ -1,4 +1,4 @@
-import BlogPost from "./Blog";
+import {BlogPost} from "./Blog";
 
 const entities = {
     BlogPost,
