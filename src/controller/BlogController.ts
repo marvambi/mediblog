@@ -62,7 +62,6 @@ export class BlogController {
       description: string;
     } = req.body;
 
-    console.log(title, description);
     const response = await this.blogRepository.query("INSERT INTO blog_post (title, description) VALUES(" + `"${title}"` + ", "  + `"${description}"` + ")");
 
     if (!response) {
