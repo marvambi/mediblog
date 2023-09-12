@@ -10,19 +10,17 @@ export class UserController {
     private userRepository = AppDataSource.getRepository(User)
 
     async all(request: Request, response: Response, next: NextFunction) {
-        return this.userRepository.find()
+        return this.userRepository.query("SELECT id, firstName, lastName, email FROM user");
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
         const id = parseInt(request.params.id)
 
 
-        const user = await this.userRepository.findOne({
-            where: { id }
-        })
+        const user = await this.userRepository.query("SELECT id, firstName, lastName, email FROM user WHERE id = " + `${id}`);
 
-        if (!user) {
-            return "unregistered user"
+        if (!user.length) {
+            return {message: `User with id: ${id} not found!`}
         }
         return user
     }
@@ -37,14 +35,14 @@ export class UserController {
         const { APP_SALT } = process.env;
 
 
-        const user = Object.assign(new User(), {
-            firstName,
-            lastName,
-            email,
-            password: secure(password, APP_SALT),
-        })
+        // const user = Object.assign(new User(), {
+        //     firstName,
+        //     lastName,
+        //     email,
+        //     password: secure(password, APP_SALT),
+        // })
 
-        return this.userRepository.save(user)
+        return this.userRepository.query("INSERT INTO user (firstName, lastName, email, password) VALUES (" + `"${firstName}", "${lastName}", "${email}", "${secure(password, APP_SALT).passwordHash}"` + ")");
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
