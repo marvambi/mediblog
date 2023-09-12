@@ -48,15 +48,15 @@ export class UserController {
     async remove(request: Request, response: Response, next: NextFunction) {
         const id = parseInt(request.params.id)
 
-        let userToRemove = await this.userRepository.findOneBy({ id })
+        let userToRemove = await this.userRepository.query("SELECT id, firstName, lastName, email FROM user WHERE id = " + `${id}`);
 
-        if (!userToRemove) {
-            return "this user not exist"
+        if (!userToRemove.length) {
+            return {message: "This user not exist"}
         }
 
-        await this.userRepository.remove(userToRemove)
+        await this.userRepository.query("DELETE FROM user WHERE id = " + `${id}`);
 
-        return "user has been removed"
+        return {message: "User has been removed"};
     }
 
 
@@ -112,7 +112,7 @@ export class UserController {
             // Check if user exists
             const user = await this.userRepository.query("SELECT * FROM user WHERE email = " + `"${email}"`);
         
-            if (!user) {
+            if (!user.length) {
                 res.status(400).send({
                 message: "User not found, please signup",
                 });
