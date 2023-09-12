@@ -20,7 +20,8 @@ export class UserController {
         const user = await this.userRepository.query("SELECT id, firstName, lastName, email FROM user WHERE id = " + `${id}`);
 
         if (!user.length) {
-            return {message: `User with id: ${id} not found!`}
+            response.status(401).send({message: `User with id: ${id} not found!`});
+            return;
         }
         return user
     }
@@ -34,14 +35,6 @@ export class UserController {
         const hash = createHash('sha256');
         const { APP_SALT } = process.env;
 
-
-        // const user = Object.assign(new User(), {
-        //     firstName,
-        //     lastName,
-        //     email,
-        //     password: secure(password, APP_SALT),
-        // })
-
         return this.userRepository.query("INSERT INTO user (firstName, lastName, email, password) VALUES (" + `"${firstName}", "${lastName}", "${email}", "${secure(password, APP_SALT).passwordHash}"` + ")");
     }
 
@@ -51,12 +44,12 @@ export class UserController {
         let userToRemove = await this.userRepository.query("SELECT id, firstName, lastName, email FROM user WHERE id = " + `${id}`);
 
         if (!userToRemove.length) {
-            return {message: "This user not exist"}
+            return response.status(401).send({message: "This user not exist"});
         }
 
         await this.userRepository.query("DELETE FROM user WHERE id = " + `${id}`);
 
-        return {message: "User has been removed"};
+        return response.status(201).send({message: "User has been removed"});
     }
 
 
